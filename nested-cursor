@@ -1,0 +1,101 @@
+IF OBJECT_ID('ACTIVE_TERMINAL_GLOBAL_dev_hatta', 'U') IS NOT NULL
+	DROP TABLE [dbo].[ACTIVE_TERMINAL_GLOBAL_dev_hatta]
+
+CREATE TABLE [dbo].[ACTIVE_TERMINAL_GLOBAL_dev_hatta](
+	[DATE] [varchar](50) NULL,
+	[YEAR] [varchar](50) NULL,
+	[MONTH_NAME] [varchar](50) NULL,
+	[WEEK_OF_MONTH] [varchar](50) NULL,
+	[ACTIVE_TERMINAL_COUNT] [varchar](50) NULL,
+	[SHARING] [varchar](50) NULL,
+	[FAGGREGATOR] [varchar](50) NULL
+) ON [PRIMARY]
+GO
+
+DECLARE @YEAR varchar(50) = '2024'
+
+DECLARE @MONTH TABLE ([name] VARCHAR(50))
+  DECLARE @WEEK TABLE ([name] VARCHAR(50))
+
+  INSERT INTO @MONTH ([name])
+  VALUES ('Januari')
+        ,('Februari')
+		,('Maret')
+		,('April')
+		,('Mei')
+		,('Juni')
+		,('Juli')
+		,('Agustus')
+		,('September')
+		,('Oktober')
+		,('November')
+		,('Desember')
+
+  INSERT INTO @WEEK ([name])
+  VALUES ('1')
+        ,('2')
+		,('3')
+		,('4')
+
+  DECLARE @current_date DATE = '01-01-2024'
+  DECLARE @COUNT INT
+  
+  DECLARE @current_month VARCHAR(50)
+
+  DECLARE month_cursor CURSOR FOR
+  SELECT [name] FROM @MONTH
+
+  OPEN month_cursor
+
+  FETCH NEXT FROM month_cursor
+  INTO @current_month
+
+  WHILE @@FETCH_STATUS = 0 
+  BEGIN
+	PRINT 'Month ' + @current_month
+
+	DECLARE @current_week VARCHAR(50)
+
+    DECLARE week_cursor CURSOR FOR
+    SELECT [name] FROM @WEEK
+
+	OPEN week_cursor
+
+	FETCH NEXT FROM week_cursor
+	INTO @current_week
+
+	WHILE @@FETCH_STATUS = 0 
+	BEGIN
+
+		SET @COUNT = RAND()*100000
+		INSERT INTO [dbo].[ACTIVE_TERMINAL_GLOBAL_dev_hatta] ([DATE], [YEAR], [MONTH_NAME], [WEEK_OF_MONTH], [ACTIVE_TERMINAL_COUNT], [FAGGREGATOR], [SHARING])
+		VALUES (@current_date, @YEAR, @current_month, @current_week, @COUNT, 0, 0)
+
+		SET @COUNT = RAND()*100000
+		INSERT INTO [dbo].[ACTIVE_TERMINAL_GLOBAL_dev_hatta] ([DATE], [YEAR], [MONTH_NAME], [WEEK_OF_MONTH], [ACTIVE_TERMINAL_COUNT], [FAGGREGATOR], [SHARING])
+		VALUES (@current_date, @YEAR, @current_month, @current_week, @COUNT, 0, 1)
+
+		SET @COUNT = RAND()*100000
+		INSERT INTO [dbo].[ACTIVE_TERMINAL_GLOBAL_dev_hatta] ([DATE], [YEAR], [MONTH_NAME], [WEEK_OF_MONTH], [ACTIVE_TERMINAL_COUNT], [FAGGREGATOR], [SHARING])
+		VALUES (@current_date, @YEAR, @current_month, @current_week, @COUNT, 1, 0)
+
+		SET @COUNT = RAND()*100000
+		INSERT INTO [dbo].[ACTIVE_TERMINAL_GLOBAL_dev_hatta] ([DATE], [YEAR], [MONTH_NAME], [WEEK_OF_MONTH], [ACTIVE_TERMINAL_COUNT], [FAGGREGATOR], [SHARING])
+		VALUES (@current_date, @YEAR, @current_month, @current_week, @COUNT, 1, 1)
+		
+		SET @current_date = DATEADD(DAY, 7, @current_date)
+
+		FETCH NEXT FROM week_cursor
+		INTO @current_week
+
+	END
+
+	CLOSE week_cursor
+    DEALLOCATE week_cursor
+
+	FETCH NEXT FROM month_cursor
+    INTO @current_month
+  END
+
+  CLOSE month_cursor
+  DEALLOCATE month_cursor
